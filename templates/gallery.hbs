@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Галерея изображений</title>
+
+<!--Подключение css библиотек -->
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/baguetteBox.css"/>  
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="icon" type="image/png" href="images/icons/icon.png"/>
+<!--Подключение js библиотек -->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+  </head>
+  <body>
+
+<!--Менюшка -->
+      <header>
+            <nav class="navbar navbar-inverse">
+                    <div class="container-fluid">
+                      <div class="navbar-header">
+                        <a class="navbar-brand" href="#">РhotoGallery</a>
+                      </div>
+                      <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">Главная</a></li>
+                        <li><a href="" id="add-album-button">Добавить альбом</a></li>
+                      </ul>
+                    </div>
+                  </nav>
+      </header>
+
+<!--Блок альбомов -->
+      <div class="container gallery-container">
+                <h1>Альбомы</h1>
+                <div class="tz-gallery">
+                    <div class="row">
+                        {{#each rows}}
+                        <div class="col-sm-6 col-md-4" id="{{id}}">
+                            <div class="thumbnail">
+                                <a class="lightbox" href="/{{id}}">
+                                    <img src="{{path_head_photo}}" alt="Park">
+                                </a>
+                                <div class="caption">
+                                    <h3>{{name_album}}</h3>
+                                    <p>{{description}}</p>
+                                </div>
+                                <button type="button" class="btn btn-primary add-photo-button" id="{{id}}">Добавить фото в алюбом</button>
+                                <button type="button" class="btn btn-danger delete-album-button" id="{{id}}">Удалить альбом</button>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+            
+                </div>
+            </div>
+
+<!--Диалоговое окно удаления альбома -->
+ <div id="delete-album-modal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h4 class="modal-title">Подтверждение удаления файла</h4>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+          <button type="button" class="btn btn-danger" id="delete">Удалить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!--Диалоговое окно добавления альбома -->
+      <div id="add-album-modal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h4 class="modal-title">Добавление альбома</h4>
+        </div>
+        
+        <div class="modal-body">
+          <form id="uploadForm" role="form" enctype="multipart/form-data" action="/" method="post">
+              <div class="input-group">
+                <label class="input-group-btn">
+                    <span class="btn btn-primary">
+                        Выберите файл:<input type="file" name="userPhoto" placeholder="Выберите фото" style="display: none;" required/>
+                    </span>
+                </label>
+                <input type="text" class="form-control" id="file" readonly>
+              </div>
+              <input type="text" name="albumname" value="" class="form-control" placeholder="Введите название альбома" required/>
+              <input type="text" name="albumDeskript" value="" class="form-control" placeholder="Введите описание альбома" required/>
+        <div class="modal-footer">
+          <input type="submit" class="btn btn-success" value="Upload Image" name="submit"/>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+        </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!--Диалоговое окно добавления файла в альбом -->
+  <div id="add-photo-modal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h4 class="modal-title">Добавление файла</h4>
+        </div>
+        <div class="modal-body">
+          <form id="uploadFileForm" role="form" enctype="multipart/form-data" action="/" method="post">
+              <div class="input-group">
+                <label class="input-group-btn">
+                    <span class="btn btn-primary">
+                    Выберите файл:<input type="file" name="userPhoto" style="display: none;"/>
+                    </span>
+                </label>
+                <input type="text" id="file2" class="form-control" readonly>
+              </div>
+              <input type="text" name="photoname" value="" class="form-control" placeholder="Введите название фото" required/>
+              <input type="hidden" name="album" value=""/>
+        
+        <div class="modal-footer">
+          <input type="submit" class="btn btn-success" value="Upload Image" name="submit"/>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+        </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--JS скрипты обработки страницы -->
+    <script>
+            $(document).ready(()=>{
+                let idAlbums;
+                let nameAlbums;
+                //Открытие диалогового окна добавления альбома
+                $('#add-album-button').click((event)=>{
+                    event.preventDefault();
+                    $('#add-album-modal').modal('show');
+                });
+
+                //Открытие диалогового окна удаления альбома
+                $('.delete-album-button').click((event)=>{
+                    idAlbums = event.target.id;
+                    nameAlbums = $(`#${event.target.id}.delete-album-button`).parent().find('h3').text();
+                    $('#delete-album-modal .modal-body').text('Вы действительно хотите удалить альбом ' + nameAlbums + '?');
+                    $('#delete-album-modal').modal('show');
+                });
+
+                //Открытие диалогового окна добавления файла в альбом
+                $('.add-photo-button').click((event)=>{
+                    $('#add-photo-modal').modal('show');
+                    $('#uploadFileForm').attr('action', `/${event.target.id}`);
+                    $('#uploadFileForm input[type=hidden]').val(`${event.target.id}`);
+                });
+                
+                // Вывод имени файла в input text при выборе картинки 
+                $(':file').on('change', ()=>{
+                $('#file').val($(':file').val().replace(/\\/g, '/').replace(/.*\//, ''));
+                }); 
+                $(':file').on('change', (event)=>{
+                $('#file2').val($(event.target).val().replace(/\\/g, '/').replace(/.*\//, ''));
+                }); 
+
+                //Скрипт удаления альбома
+                $('#delete').click(()=>{
+                $.ajax({
+                  method: "DELETE",
+                  url: "/",
+                  data: { id: idAlbums}
+                  })
+                  .done(function( msg ) {
+                      $('#delete-album-modal .modal-body').text(msg); 
+                  });
+
+                setTimeout(()=>{
+                  $('div#'+idAlbums).remove();
+                  $('#delete-album-modal').modal('hide');
+                }, 2000); 
+            });
+            });
+
+    </script>
+
+      </body>
+</html>

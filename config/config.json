@@ -1,0 +1,19 @@
+{
+    "port" : 3000,
+    "host" : "127.0.0.1",
+    "hostDB" : "127.0.0.1",
+    "userDB" : "root",
+    "passwordDB" : "",
+    "database" : "gallery",
+    "destPhotos" : "public/images/",
+    "formFileName" : "userPhoto",
+    "session" : {
+        "secret" : "ItIsDatabase",
+        "key" : "sid",
+        "cookie" : {
+            "path" : "/",
+            "httpOnly" : "true",
+            "maxAge" : null
+        }
+    }
+}
